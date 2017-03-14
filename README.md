@@ -1,2 +1,2 @@
 # Thesis_SKKU
-The graduation thesis 
+This is the journey to completing my graduation thesis.
