@@ -1,0 +1,47 @@
+# Bugs Chart Crawler (http://music.bugs.co.kr/)
+# Designed by Soo Min, Jeong
+
+from selenium import webdriver
+from datetime import date, timedelta
+from time import strftime
+
+
+def main(urlDate):
+    url = "http://music.bugs.co.kr/genre/chart/kpop/indie/total/week?date=" + urlDate.strftime('%Y%m%d')
+    print(url)
+
+    chromeOptions = webdriver.ChromeOptions()
+    prefs = {"profile.managed_default_content_settings.images": 2}
+    chromeOptions.add_experimental_option("prefs", prefs)
+    driver = webdriver.Chrome(chrome_options=chromeOptions)
+    driver.get(url)
+
+    fileName = "bugsChart(" + urlDate.strftime('%Y%m%d') + ")" + strftime("_%m%d_%Hh%M") + '.txt'
+    file = open(fileName, "w", 1, "utf-8")
+
+    chart = driver.find_element_by_id("CHARTweek")
+    songs = chart.find_elements_by_tag_name("tr")
+
+    # songs = chart.find_elements_by_class_name("list trackList byChart")
+
+    for oneSong in songs[1:]:
+        rank = oneSong.find_element_by_class_name("ranking").find_element_by_tag_name("strong").text
+        title = oneSong.find_element_by_class_name("title").text
+        artist = oneSong.find_element_by_class_name("artist").text.split()[0].split('(')[0]
+        file.write(rank + '\t' + title + '\t' + artist + '\n')
+        print(rank + "/title:" + title + '\t' + "/artist:" + artist)
+
+    driver.quit()
+    file.close()
+
+
+firstDate = date(2014, 8, 16)
+
+dateRes = date.today()
+while (dateRes >= firstDate):
+    dateRes = dateRes - timedelta(days=7)
+    main(dateRes)
+
+
+
+
